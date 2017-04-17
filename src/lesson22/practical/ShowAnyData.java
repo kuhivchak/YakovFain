@@ -19,7 +19,7 @@ class ShowAnyData {
         }
 
         try {
-            // Class.forName("org.apache.derby.jdbc.ClientDriver");
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
 
             conn = DriverManager.getConnection("jdbc:derby://localhost:1527/Lesson22");
 
