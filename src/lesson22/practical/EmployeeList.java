@@ -10,29 +10,24 @@ class EmployeeList {
     public static void main(String argv[]) {
 
         String urlDerbyDB = "jdbc:derby://localhost:1527/C:/Program Files/Java/jdk1.8.0_102/db/bin/Lesson22";
-        String urlJDBC = "org.apache.derby.jdbc.ClientDriver";
+        //String urlJDBC = "org.apache.derby.jdbc.ClientDriver";
+        //Class.forName(urlJDBC);
+        // Build an SQL String
+        String sqlQuery = "SELECT * from Employee";
 
-        try (Connection connection = DriverManager.getConnection(urlDerbyDB)){
-            Class.forName(urlJDBC);
-
-            // Build an SQL String
-            String sqlQuery = "SELECT * from Employee";
-
-            // Create a Statement object
-            PreparedStatement prstmt = connection.prepareStatement(sqlQuery);
-
-            // Execute SQL and get obtain the ResultSet object
-            ResultSet rs = prstmt.executeQuery();
+        try (Connection connection = DriverManager.getConnection(urlDerbyDB);
+             // Create a Statement object
+             PreparedStatement prstmt = connection.prepareStatement(sqlQuery);
+             // Execute SQL and get obtain the ResultSet object
+             ResultSet rs = prstmt.executeQuery()) {
 
             // Process the result set - print Employees
             while (rs.next()) {
                 int empNo = rs.getInt("EMPNO");
                 String eName = rs.getString("ENAME");
                 String job = rs.getString("JOB_TITLE");
-                System.out.println("" + empNo + ", " + eName + ", " + job);
+                System.out.println(empNo + ", " + eName + ", " + job);
             }
-        } catch (SQLException | ClassNotFoundException e) {
-            System.err.println(e.getMessage());
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
