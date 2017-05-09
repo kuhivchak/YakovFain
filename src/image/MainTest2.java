@@ -1,3 +1,5 @@
+package image;
+
 import org.jetbrains.annotations.NotNull;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.*;
@@ -17,16 +19,16 @@ import static org.opencv.imgproc.Imgproc.resize;
  *
  */
 public class MainTest2 {
-    static String fileName1 = "v1.jpg";
-    static String fileName2 = "v2.jpg";
+    static String fileName1 = "ism1.jpg";
+    static String fileName2 = "ism2.jpg";
     static FeatureDetector detector;
     static DescriptorExtractor descriptor;
     static DescriptorMatcher matcher;
 
     static {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        detector = FeatureDetector.create(FeatureDetector.ORB);
-        descriptor = DescriptorExtractor.create(DescriptorExtractor.ORB);
+        detector = FeatureDetector.create(FeatureDetector.BRISK);
+        descriptor = DescriptorExtractor.create(DescriptorExtractor.BRIEF);
         matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
     }
 
@@ -43,8 +45,8 @@ public class MainTest2 {
         Mat descriptorImage2 = compute(loadedImage2, keyPointsResizedImage2);
 
         //______________________________________________________________________________________________________________________________________________________________
-        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/images", "root", "root");
-        Images imageWrite = new Images(loadedImage, keyPointsResizedImage, descriptorImage);
+        /*Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/images", "root", "root");
+        Images imageWrite = new Images(loadedImage, keyPointsResizedImage, descriptorImage);*/
         /*
         try {
             FileOutputStream fileOut = new FileOutputStream("images.ser");
@@ -63,7 +65,7 @@ public class MainTest2 {
         statement.setInt(2, 3);
         statement.executeUpdate();*/
 
-        //TODO __________________________________________________________________________________________________________________________________________________________
+        /*//TODO __________________________________________________________________________________________________________________________________________________________
         PreparedStatement statement = connection.prepareStatement("insert into images (dataImage, idUser) VALUES (?, ?)");
         statement.setObject(1, imageWrite);
         statement.setInt(2,3);
@@ -84,33 +86,30 @@ public class MainTest2 {
 
         resultSet.close();
         stat.close();
-        connection.close();
+        connection.close();*/
         //_________________________________________________________________________________________________________________________________
 
 // MATCHING
 // match these two keypoints sets
-        List<MatOfDMatch> matches = findMatches(DBDescriptor, descriptorImage2, 5);
+        List<MatOfDMatch> matches = findMatches(descriptorImage, descriptorImage2, 5);
         List<DMatch> goodMatches = filterMatches(matches);
-        List<DMatch> bestMatches = filterHomography(goodMatches, DBKeyPoints, keyPointsResizedImage2);
+        List<DMatch> bestMatches = filterHomography(goodMatches, keyPointsResizedImage, keyPointsResizedImage2);
         //Sort
         sortBestMatches(bestMatches);
 
         MatOfDMatch topTenBestMatches = new MatOfDMatch();
         topTenBestMatches.fromList(bestMatches.subList(0, 10));
 
-        corners(bestMatches, topTenBestMatches, DBKeyPoints, keyPointsResizedImage2);
+        corners(bestMatches, topTenBestMatches, keyPointsResizedImage, keyPointsResizedImage2);
 
-        Mat outputImg = drawImage(DBImage, DBKeyPoints, loadedImage2, keyPointsResizedImage2, topTenBestMatches);
+        Mat outputImg = drawImage(loadedImage, keyPointsResizedImage, loadedImage2, keyPointsResizedImage2, topTenBestMatches);
 
         Imgcodecs.imwrite("result.jpg", outputImg);
 
-        System.out.println("Згенеровано КТ1: " + DBKeyPoints.toArray().length);
-        System.out.println("Згенеровано КТ2: " + keyPointsResizedImage2.toArray().length);
+        System.out.println("Згенеровано Ключових точок 1: " + keyPointsResizedImage.toArray().length);
+        System.out.println("Згенеровано Ключових точок 2: " + keyPointsResizedImage2.toArray().length);
         System.out.println("Спільних точок: " + bestMatches.size());
         System.out.println("Відсоток спільних точок: " + (((double) bestMatches.size() / keyPointsResizedImage2.toArray().length) * 100));
-
-
-
     }
 
     private static Mat drawImage(Mat loadedImage, MatOfKeyPoint keyPointsResizedImage, Mat loadedImage2, MatOfKeyPoint keyPointsResizedImage2, MatOfDMatch topTenBestMatches) {

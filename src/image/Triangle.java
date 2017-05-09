@@ -1,3 +1,5 @@
+package image;
+
 import org.opencv.core.Point;
 
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
-import org.opencv.core.Point;
+package image;
 
-import static org.junit.Assert.*;
+import org.opencv.core.Point;
 
 /**
  * Created by Vladik on 01.05.2017.
